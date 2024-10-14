@@ -28,4 +28,4 @@ WORKDIR /htb
 # install python dependencies
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen
-EXPOSE 8000 5000 3000
+EXPOSE 8000
