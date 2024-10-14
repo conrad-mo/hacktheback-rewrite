@@ -2,10 +2,10 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
-@router.post("/forms/save", tags=["forms"])
+@router.post("/save")
 async def save():
     return {"username": "fakecurrentuser"}
 
-@router.post("/forms/submit", tags=["forms"])
+@router.post("/submit")
 async def submit():
     return {"username": "fakecurrentuser"}

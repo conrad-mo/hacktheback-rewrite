@@ -2,22 +2,22 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
-@router.post("/account/login", tags=["account"])
+@router.post("/login")
 async def login():
     return {"username": "fakecurrentuser"}
 
-@router.post("/account/signup", tags=["account"])
+@router.post("/signup")
 async def signup():
     return {"username": "fakecurrentuser"}
 
-@router.put("/account/verify", tags=["account"])
+@router.put("/verify")
 async def verify():
     return {"username": "fakecurrentuser"}
 
-@router.get("/account/reset_password", tags=["account"])
+@router.get("/reset_password")
 async def reset_password():
     return {"username": "fakecurrentuser"}
 
-@router.post("/account/refresh", tags=["account"])
+@router.post("/refresh")
 async def refresh():
     return {"username": "fakecurrentuser"}
