@@ -1,11 +1,8 @@
 # main.py
-from fastapi import Depends, FastAPI, HTTPException, Query
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import router
-from app.models import Item
-from app.core.db import get_session, SessionDep, create_db_and_tables
-from typing import Annotated
+from app.core.db import create_db_and_tables
 
 def get_application():
     app = FastAPI()
@@ -31,19 +28,3 @@ def on_startup():
 @app.get("/")
 async def read_root():
     return {"Hello": "World"}
-
-@app.post("/items/")
-async def create_item(item: Item, session: SessionDep):
-    session.add(item)
-    session.commit()
-    session.refresh(item)
-    return item
-
-@app.get("/items/")
-def read_items(
-    session: SessionDep,
-    offset: int = 0,
-    limit: Annotated[int, Query(le=100)] = 100,
-) -> list[Item]:
-    items = session.exec(select(Item).offset(offset).limit(limit)).all()
-    return items
