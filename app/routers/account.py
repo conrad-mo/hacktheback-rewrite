@@ -1,15 +1,17 @@
 from fastapi import APIRouter, Query
 from sqlmodel import Session, select
-from app.models import UserPublic, UserCreate, Account_User
+from app.models import UserPublic, UserCreate, Account_User, UserLogin
 from app.core.db import SessionDep
-from app.utils import hash_password
+from app.utils import hash_password, password_verfiy
 from typing import Annotated
 
 router = APIRouter()
 
 @router.post("/login")
-async def login():
-    return {"username": "fakecurrentuser"}
+async def login(user: UserLogin, session: SessionDep) -> bool:
+    statement= select(Account_User).where(Account_User.email == user.email)
+    selected_user = session.exec(statement).one()
+    return password_verfiy(user.password, selected_user.password)
 
 @router.post("/signup", response_model=UserPublic)
 async def signup(user: UserCreate, session: SessionDep):

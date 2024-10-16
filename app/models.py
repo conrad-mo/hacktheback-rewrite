@@ -8,6 +8,10 @@ class UserBase(SQLModel):
     last_name: str = Field(index=True)
     email: str = Field(index=True)
 
+class UserLogin(SQLModel):
+    email: str
+    password: str
+
 class Account_User(UserBase, table=True):
     uid: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)    
     password: str = Field()
