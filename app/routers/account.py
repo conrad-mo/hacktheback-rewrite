@@ -14,7 +14,7 @@ async def login():
 @router.post("/signup", response_model=UserPublic)
 async def signup(user: UserCreate, session: SessionDep):
     hashed_password = hash_password(user.password)
-    extra_data = {"password": hashed_password}
+    extra_data = {"password": hashed_password, "role": "hacker", "is_active": False}
     db_user = Account_User.model_validate(user, update=extra_data)
     session.add(db_user)
     session.commit()
