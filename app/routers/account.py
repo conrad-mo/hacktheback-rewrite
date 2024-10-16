@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query
 from sqlmodel import Session, select
-from app.models import Item
-from app.core.db import SessionDep, create_db_and_tables
+from app.models import User
+from app.core.db import SessionDep
 from typing import Annotated
 
 router = APIRouter()
@@ -11,8 +11,11 @@ async def login():
     return {"username": "fakecurrentuser"}
 
 @router.post("/signup")
-async def signup():
-    return {"username": "fakecurrentuser"}
+async def signup(user: User, session: SessionDep):
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return session
 
 @router.put("/verify")
 async def verify():
@@ -25,19 +28,3 @@ async def reset_password():
 @router.post("/refresh")
 async def refresh():
     return {"username": "fakecurrentuser"}
-
-@router.post("/items")
-async def create_item(item: Item, session: SessionDep):
-    session.add(item)
-    session.commit()
-    session.refresh(item)
-    return item
-
-@router.get("/items")
-def read_items(
-    session: SessionDep,
-    offset: int = 0,
-    limit: Annotated[int, Query(le=100)] = 100,
-) -> list[Item]:
-    items = session.exec(select(Item).offset(offset).limit(limit)).all()
-    return items
