@@ -1,6 +1,4 @@
 from fastapi import APIRouter
-from app.models import Hero
-
 
 router = APIRouter()
 
