@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Query
 from sqlmodel import Session, select
-from app.models import User
+from app.models import UserPublic, UserCreate, Account_User
 from app.core.db import SessionDep
+from app.utils import hash_password
 from typing import Annotated
 
 router = APIRouter()
@@ -10,12 +11,15 @@ router = APIRouter()
 async def login():
     return {"username": "fakecurrentuser"}
 
-@router.post("/signup")
-async def signup(user: User, session: SessionDep):
-    session.add(user)
+@router.post("/signup", response_model=UserPublic)
+async def signup(user: UserCreate, session: SessionDep):
+    hashed_password = hash_password(user.password)
+    extra_data = {"password": hashed_password}
+    db_user = Account_User.model_validate(user, update=extra_data)
+    session.add(db_user)
     session.commit()
-    session.refresh(user)
-    return session
+    session.refresh(db_user)
+    return db_user
 
 @router.put("/verify")
 async def verify():
