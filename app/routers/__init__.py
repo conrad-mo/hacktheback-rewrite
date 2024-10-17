@@ -1,5 +1,4 @@
 from fastapi import Depends, APIRouter, HTTPException, status, Security
-from fastapi.security import OAuth2PasswordBearer
 from typing import Annotated
 from app.models import UserPublic, TokenData
 
