@@ -187,6 +187,7 @@ dependencies = [
     { name = "passlib" },
     { name = "psycopg2-binary" },
     { name = "pyjwt" },
+    { name = "python-dotenv" },
     { name = "sqlmodel" },
 ]
 
@@ -197,6 +198,7 @@ requires-dist = [
     { name = "passlib", specifier = ">=1.7.4" },
     { name = "psycopg2-binary", specifier = ">=2.9.9" },
     { name = "pyjwt", specifier = ">=2.9.0" },
+    { name = "python-dotenv", specifier = ">=1.0.1" },
     { name = "sqlmodel", specifier = ">=0.0.22" },
 ]
 

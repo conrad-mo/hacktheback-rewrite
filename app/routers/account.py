@@ -5,29 +5,22 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 from app.models import UserPublic, UserCreate, Account_User, UserLogin, Token, TokenData
 from app.core.db import SessionDep
-from app.utils import hash_password, password_verfiy
+from app.utils import hash_password, password_verfiy, create_access_token
 from typing import Annotated
 import jwt
 from jwt.exceptions import InvalidTokenError
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
-SECRET_KEY = ""
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 2
 
 router = APIRouter()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
-
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: SessionDep):
     credentials_exception = HTTPException(
@@ -64,9 +57,14 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], sess
             status_code=status.HTTP_401_NOT_FOUND, 
             detail="Password is incorrect"
         )
+    if not selected_user.is_active:
+      raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Account not activated"
+        )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": selected_user.email}, expires_delta=access_token_expires
+        data={"sub": selected_user.email}, SECRET_KEY=SECRET_KEY, ALGORITHM=ALGORITHM, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
 

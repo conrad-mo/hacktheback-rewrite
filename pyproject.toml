@@ -10,5 +10,6 @@ dependencies = [
     "passlib>=1.7.4",
     "psycopg2-binary>=2.9.9",
     "pyjwt>=2.9.0",
+    "python-dotenv>=1.0.1",
     "sqlmodel>=0.0.22",
 ]
