@@ -33,17 +33,17 @@ async def decode_jwt(token: Annotated[str, Depends(oauth2_scheme)]):
     )
   try:
       payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-      uid: str = payload.get("sub")
+      email: str = payload.get("sub")
       scopes: list[str] = payload.get("scopes", [])
-      if uid is None:
+      if email is None:
           raise credentials_exception
-      token_data = TokenData(uid=uid, scopes=scopes)
+      token_data = TokenData(email=email, scopes=scopes)
   except InvalidTokenError:
       raise credentials_exception
   return token_data
 
 async def get_current_user(token_data: Annotated[TokenData, Depends(decode_jwt)], session: SessionDep):
-    statement= select(Account_User).where(Account_User.uid == token_data.uid)
+    statement= select(Account_User).where(Account_User.email == token_data.email)
     user = session.exec(statement).first()
     if user is None:
         raise credentials_exception
@@ -74,7 +74,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], sess
       scopes.append("admin")
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": str(selected_user.uid), "scopes": scopes}, SECRET_KEY=SECRET_KEY, ALGORITHM=ALGORITHM, expires_delta=access_token_expires
+        data={"sub": str(selected_user.email), "scopes": scopes}, SECRET_KEY=SECRET_KEY, ALGORITHM=ALGORITHM, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
 
