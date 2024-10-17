@@ -34,10 +34,10 @@ async def decode_jwt(token: Annotated[str, Depends(oauth2_scheme)]):
   try:
       payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
       uid: str = payload.get("sub")
-      scopes: list[str] = payload.get("scopes")
+      scopes: list[str] = payload.get("scopes", [])
       if uid is None:
           raise credentials_exception
-      token_data = TokenData(uid=uid)
+      token_data = TokenData(uid=uid, scopes=scopes)
   except InvalidTokenError:
       raise credentials_exception
   return token_data
@@ -69,9 +69,12 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], sess
             status_code=status.HTTP_404_NOT_FOUND, 
             detail="Account not activated"
         )
+    scopes = []
+    if selected_user.role == "admin":
+      scopes.append("admin")
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": str(selected_user.uid), "scopes": form_data.scopes}, SECRET_KEY=SECRET_KEY, ALGORITHM=ALGORITHM, expires_delta=access_token_expires
+        data={"sub": str(selected_user.uid), "scopes": scopes}, SECRET_KEY=SECRET_KEY, ALGORITHM=ALGORITHM, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
 
