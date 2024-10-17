@@ -1,22 +1,22 @@
-from fastapi import Depends, APIRouter, HTTPException, status
+from fastapi import Depends, APIRouter, HTTPException, status, Security
 from fastapi.security import OAuth2PasswordBearer
 from typing import Annotated
-from app.models import UserPublic, Account_User
+from app.models import UserPublic, TokenData
 
-from app.routers.account import get_current_user
+from app.routers.account import decode_jwt
 from app.routers.account import router as account
 from app.routers.forms import router as forms
 from app.routers.admin import router as admin
 
 router = APIRouter()
 
-def is_admin(current_user: Annotated[Account_User, Depends(get_current_user)]) -> UserPublic:
-    if not current_user.role == "admin":
+def is_admin(token_data: Annotated[TokenData, Security(decode_jwt, scopes=["admin"])]) -> bool:
+    if "admin" not in token_data.scopes:
       raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, 
             detail="User does not permission"
         )
-    return current_user
+    return True
 
 router.include_router(account, prefix="/account", tags=["account"])
 router.include_router(forms, prefix="/forms", tags=["forms"])

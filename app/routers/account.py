@@ -20,23 +20,30 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 2
 
 router = APIRouter()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(
+  tokenUrl="login",
+  scopes={"admin": "Allow user to call admin routes", "volunteer": "Allow user to call qr routes"},
+)
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: SessionDep):
-    credentials_exception = HTTPException(
+async def decode_jwt(token: Annotated[str, Depends(oauth2_scheme)]):
+  credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid credentials or expired token",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
-            raise credentials_exception
-        token_data = TokenData(email=email)
-    except InvalidTokenError:
-        raise credentials_exception
-    statement= select(Account_User).where(Account_User.email == token_data.email)
+  try:
+      payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+      uid: str = payload.get("sub")
+      scopes: list[str] = payload.get("scopes")
+      if uid is None:
+          raise credentials_exception
+      token_data = TokenData(uid=uid)
+  except InvalidTokenError:
+      raise credentials_exception
+  return token_data
+
+async def get_current_user(token_data: Annotated[TokenData, Depends(decode_jwt)], session: SessionDep):
+    statement= select(Account_User).where(Account_User.uid == token_data.uid)
     user = session.exec(statement).first()
     if user is None:
         raise credentials_exception
@@ -64,7 +71,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], sess
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": selected_user.email}, SECRET_KEY=SECRET_KEY, ALGORITHM=ALGORITHM, expires_delta=access_token_expires
+        data={"sub": str(selected_user.uid), "scopes": form_data.scopes}, SECRET_KEY=SECRET_KEY, ALGORITHM=ALGORITHM, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
 

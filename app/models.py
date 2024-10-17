@@ -8,7 +8,8 @@ class Token(BaseModel):
     token_type: str
 
 class TokenData(BaseModel):
-    email: str | None = None
+    uid: uuid.UUID | None = None
+    scopes: list[str] = []
 
 class UserBase(SQLModel):
     first_name: str = Field(index=True)
@@ -36,8 +37,10 @@ class UserPublic(UserBase):
 class UserUpdate(SQLModel):
     password: str | None = None
 
-class Form(SQLModel):
-    idk: str
+class Forms_HackathonApplicant(SQLModel, table=True):
+    uid: str = Field(index=True, primary_key=True)
+    status: str
+    application_id: str = Field(default_factory=uuid.uuid4,index=True)
 
-class FormUpdate(SQLModel):
+class FormHackathonApplicantUpdate(SQLModel):
     idk: str | None = None
