@@ -1,4 +1,5 @@
 from sqlmodel import SQLModel, Field
+from pydantic import BaseModel
 from typing import Optional
 import uuid
 
@@ -8,7 +9,7 @@ class UserBase(SQLModel):
     last_name: str = Field(index=True)
     email: str = Field(index=True)
 
-class UserLogin(SQLModel):
+class UserLogin(BaseModel):
     email: str
     password: str
 
