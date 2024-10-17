@@ -95,6 +95,10 @@ async def read_users_me(
 async def reset_password():
     return {"username": "fakecurrentuser"}
 
+@router.post("/activate")
+async def activate():
+    return {"username": "fakecurrentuser"}
+
 @router.post("/refresh")
 async def refresh():
     return {"username": "fakecurrentuser"}
