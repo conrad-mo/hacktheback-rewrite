@@ -25,7 +25,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: SessionDep):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid credentials/Expired token",
+        detail="Invalid credentials or expired token",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
@@ -42,7 +42,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], sessio
         raise credentials_exception
     return user
 
-#Uses type application/x-www-form-urlencoded body, not JSON
+#Uses type application/x-www-form-urlencoded for response body, not JSON
 @router.post("/login")
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], session: SessionDep) -> Token:
     statement= select(Account_User).where(Account_User.email == form_data.username)
