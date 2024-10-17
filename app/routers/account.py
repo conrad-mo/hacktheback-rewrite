@@ -25,7 +25,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: SessionDep):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="Invalid credentials/Expired token",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
