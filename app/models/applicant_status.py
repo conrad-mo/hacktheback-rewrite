@@ -17,3 +17,7 @@ class StatusEnum(str, Enum):
 class Applicant_Status(SQLModel, table=True):
     uid: uuid.UUID = Field(index=True, primary_key=True)    
     status: StatusEnum = Field()
+
+class Update_Applicant_Status(SQLModel):
+    uid: uuid.UUID  
+    status: StatusEnum
