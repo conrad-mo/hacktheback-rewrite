@@ -13,6 +13,7 @@ class StatusEnum(str, Enum):
     REJECTED_INVITE = "REJECTED_INVITE"
     SCANNED_IN = "SCANNED_IN"
     WALK_IN = "WALK_IN"
+    WALK_IN_SUBMITTED = "WALK_IN_SUBMITTED"
 
 class Applicant_Status(SQLModel, table=True):
     uid: uuid.UUID = Field(index=True, primary_key=True)    
