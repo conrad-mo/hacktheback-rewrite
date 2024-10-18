@@ -1,15 +1,6 @@
 from sqlmodel import SQLModel, Field
 from pydantic import BaseModel
-from typing import Optional
 import uuid
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-class TokenData(BaseModel):
-    email: str | None = None
-    scopes: list[str] = []
 
 class UserBase(SQLModel):
     first_name: str = Field(index=True)
@@ -36,11 +27,3 @@ class UserPublic(UserBase):
 
 class UserUpdate(SQLModel):
     password: str | None = None
-
-class Forms_HackathonApplicant(SQLModel, table=True):
-    uid: str = Field(index=True, primary_key=True)
-    status: str
-    application_id: str = Field(default_factory=uuid.uuid4,index=True)
-
-class FormHackathonApplicantUpdate(SQLModel):
-    idk: str | None = None

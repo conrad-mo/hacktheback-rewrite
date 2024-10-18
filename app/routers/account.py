@@ -3,7 +3,8 @@ from datetime import datetime, timedelta, timezone
 from fastapi import Depends, APIRouter, Query, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlmodel import Session, select
-from app.models import UserPublic, UserCreate, Account_User, UserLogin, Token, TokenData
+from app.models.user import UserPublic, UserCreate, Account_User, UserLogin
+from app.models.token import Token, TokenData
 from app.core.db import SessionDep
 from app.utils import hash_password, password_verfiy, create_access_token
 from typing import Annotated

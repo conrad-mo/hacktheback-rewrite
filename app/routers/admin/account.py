@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
 from sqlmodel import Session, select
-from app.models import UserPublic, Account_User
+from app.models.user import UserPublic, Account_User
 from app.core.db import SessionDep
 from typing import Annotated
 

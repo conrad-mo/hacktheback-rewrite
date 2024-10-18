@@ -1,6 +1,7 @@
 from fastapi import Depends, APIRouter, HTTPException, status, Security
 from typing import Annotated
-from app.models import UserPublic, TokenData
+from app.models.user import UserPublic
+from app.models.token import TokenData
 
 from app.routers.account import decode_jwt
 from app.routers.account import router as account
