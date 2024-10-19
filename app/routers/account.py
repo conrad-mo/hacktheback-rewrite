@@ -1,9 +1,9 @@
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 
-from fastapi import Depends, APIRouter, Query, HTTPException, status
+from fastapi import Depends, APIRouter, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from sqlmodel import Session, select
-from app.models.user import UserPublic, UserCreate, Account_User, UserLogin
+from sqlmodel import select
+from app.models.user import UserPublic, UserCreate, Account_User
 from app.models.token import Token, TokenData
 from app.core.db import SessionDep
 from app.utils import hash_password, password_verfiy, create_access_token
@@ -26,12 +26,13 @@ oauth2_scheme = OAuth2PasswordBearer(
   scopes={"admin": "Allow user to call admin routes", "volunteer": "Allow user to call qr routes"},
 )
 
-async def decode_jwt(token: Annotated[str, Depends(oauth2_scheme)]):
-  credentials_exception = HTTPException(
+credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid credentials or expired token",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
+async def decode_jwt(token: Annotated[str, Depends(oauth2_scheme)]):
   try:
       payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
       email: str = payload.get("sub")

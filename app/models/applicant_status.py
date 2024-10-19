@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field
-from pydantic import BaseModel
 import uuid
+from enum import Enum
 
 class StatusEnum(str, Enum):
     APPLYING = "APPLYING"
@@ -22,3 +22,9 @@ class Applicant_Status(SQLModel, table=True):
 class Update_Applicant_Status(SQLModel):
     uid: uuid.UUID  
     status: StatusEnum
+
+#Python enums
+# user_status = StatusEnum.APPLYING
+
+# if user_status == StatusEnum.ACCEPTED:
+#     print("User has been accepted.")
