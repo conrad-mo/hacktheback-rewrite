@@ -6,6 +6,7 @@ from typing import Annotated
 
 router = APIRouter()
 
+
 @router.get("/getusers", response_model=list[UserPublic])
 def get_users(
     session: SessionDep,
