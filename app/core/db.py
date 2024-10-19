@@ -1,7 +1,8 @@
-from sqlmodel import create_engine, SQLModel, Session
 import os
 from typing import Annotated
+
 from fastapi import Depends
+from sqlmodel import Session, SQLModel, create_engine
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 

@@ -1,6 +1,7 @@
-from sqlmodel import SQLModel, Field
 import uuid
 from enum import Enum
+
+from sqlmodel import Field, SQLModel
 
 
 class StatusEnum(str, Enum):

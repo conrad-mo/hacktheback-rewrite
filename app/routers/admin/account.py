@@ -1,8 +1,10 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Query
 from sqlmodel import select
-from app.models.user import UserPublic, Account_User
+
 from app.core.db import SessionDep
-from typing import Annotated
+from app.models.user import Account_User, UserPublic
 
 router = APIRouter()
 

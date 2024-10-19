@@ -1,6 +1,7 @@
-from passlib.hash import pbkdf2_sha256
 from datetime import datetime, timedelta, timezone
+
 import jwt
+from passlib.hash import pbkdf2_sha256
 
 
 def hash_password(password: str) -> str:

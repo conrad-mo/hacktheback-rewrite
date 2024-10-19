@@ -1,8 +1,9 @@
 # main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import router
+
 from app.core.db import create_db_and_tables
+from app.routers import router
 
 
 def get_application():

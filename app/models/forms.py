@@ -1,5 +1,6 @@
-from sqlmodel import SQLModel, Field
 import uuid
+
+from sqlmodel import Field, SQLModel
 
 
 class Forms_HackathonApplicant(SQLModel, table=True):
