@@ -127,5 +127,12 @@ async def activate():
 
 
 @router.post("/refresh")
-async def refresh():
-    return {"username": "fakecurrentuser"}
+async def refresh(token_data: Annotated[TokenData, Depends(decode_jwt)]) -> Token:
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": str(token_data.email), "scopes": token_data.scopes},
+        SECRET_KEY=SECRET_KEY,
+        ALGORITHM=ALGORITHM,
+        expires_delta=access_token_expires,
+    )
+    return Token(access_token=access_token, token_type="bearer")
