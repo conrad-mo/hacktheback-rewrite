@@ -8,4 +8,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     email: str | None = None
+    fullName: str | None = None
+    firstName: str | None = None
+    lastName: str | None = None
     scopes: list[str] = []

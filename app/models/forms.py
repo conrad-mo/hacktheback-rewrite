@@ -49,8 +49,10 @@ class Forms_Question(SQLModel, table=True):
     required: bool
 
 
+# API to return everything related and we just pass id to modify form answers or else need to index question table for every update
 class Forms_Answer(SQLModel, table=True):
-    application_id: uuid.UUID = Field(primary_key=True)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    application_id: uuid.UUID = Field(index=True)
     question_id: uuid.UUID = Field(index=True)
     answer: str
 

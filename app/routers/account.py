@@ -18,7 +18,7 @@ load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 2
+ACCESS_TOKEN_EXPIRE_MINUTES = 1
 
 router = APIRouter()
 
@@ -42,9 +42,18 @@ async def decode_jwt(token: Annotated[str, Depends(oauth2_scheme)]):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
         scopes: list[str] = payload.get("scopes", [])
+        fullName: str = payload.get("fullName")
+        firstName: str = payload.get("firstName")
+        lastName: str = payload.get("lastName")
         if email is None:
             raise credentials_exception
-        token_data = TokenData(email=email, scopes=scopes)
+        token_data = TokenData(
+            email=email,
+            fullName=fullName,
+            firstName=firstName,
+            lastName=lastName,
+            scopes=scopes,
+        )
     except InvalidTokenError:
         raise credentials_exception
     return token_data
@@ -84,7 +93,13 @@ async def login(
         scopes.append("admin")
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": str(selected_user.email), "scopes": scopes},
+        data={
+            "sub": str(selected_user.email),
+            "fullName": f"{selected_user.first_name} {selected_user.last_name}",
+            "firstName": selected_user.first_name,
+            "lastName": selected_user.last_name,
+            "scopes": scopes,
+        },
         SECRET_KEY=SECRET_KEY,
         ALGORITHM=ALGORITHM,
         expires_delta=access_token_expires,
