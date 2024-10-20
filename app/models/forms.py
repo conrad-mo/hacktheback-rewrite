@@ -59,10 +59,3 @@ class Forms_Answer(SQLModel, table=True):
 
 class Forms_AnswerUpdate(SQLModel):
     answer: str | None = None
-
-
-# Python enums
-# user_status = StatusEnum.APPLYING
-
-# if user_status == StatusEnum.ACCEPTED:
-#     print("User has been accepted.")
