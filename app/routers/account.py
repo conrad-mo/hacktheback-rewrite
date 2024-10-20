@@ -98,7 +98,7 @@ async def signup(user: UserCreate, session: SessionDep):
     selected_user = session.exec(statement).first()
     if selected_user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Email already in use"
+            status_code=status.HTTP_404_NOT_FOUND, detail="User already exists"
         )
     hashed_password = hash_password(user.password)
     extra_data = {"password": hashed_password, "role": "hacker", "is_active": False}
