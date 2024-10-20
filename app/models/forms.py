@@ -1,5 +1,5 @@
 import uuid
-from datetime import timezone
+from datetime import datetime
 from enum import Enum
 
 from sqlmodel import Field, SQLModel
@@ -16,20 +16,20 @@ class StatusEnum(str, Enum):
     REJECTED_INVITE = "REJECTED_INVITE"
     SCANNED_IN = "SCANNED_IN"
     WALK_IN = "WALK_IN"
-    WALK_IN_SUBMITTED = "WALK_IN_SUBMITTED"
+    WALK_IN_SUBMITTED = "WALK_IN SUBMITTED"
 
 
 class Forms_Application(SQLModel, table=True):
     uid: uuid.UUID = Field(primary_key=True)
     is_draft: bool
-    created_at: timezone
-    updated_at: timezone
+    created_at: datetime
+    updated_at: datetime
     application_id: uuid.UUID = Field(default_factory=uuid.uuid4, index=True)
 
 
 class Forms_ApplicationUpdate(SQLModel):
     is_draft: bool | None = None
-    updated_at: timezone | None = None
+    updated_at: datetime | None = None
 
 
 # Separate bc no race conditions when updating rows?
@@ -43,7 +43,7 @@ class Forms_HackathonApplicantUpdate(SQLModel):
 
 
 class Forms_Question(SQLModel, table=True):
-    question_id: uuid.UUID = Field(default_factory=uuid.uuid4, index=True)
+    question_id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     order: int = Field(index=True)
     label: str
     required: bool
