@@ -19,31 +19,44 @@ class StatusEnum(str, Enum):
     WALK_IN_SUBMITTED = "WALK_IN_SUBMITTED"
 
 
-class Forms_Response(SQLModel, table=True):
-    uid: str = Field(primary_key=True)
+class Forms_Application(SQLModel, table=True):
+    uid: uuid.UUID = Field(primary_key=True)
     is_draft: bool
     created_at: timezone
     updated_at: timezone
-    application_id: str = Field(default_factory=uuid.uuid4, index=True)
+    application_id: uuid.UUID = Field(default_factory=uuid.uuid4, index=True)
 
 
-class FormResponseUpdate(SQLModel):
-    idk: str | None = None
+class Forms_ApplicationUpdate(SQLModel):
+    is_draft: bool | None = None
+    updated_at: timezone | None = None
 
 
-# Separate bc no race conditions?
+# Separate bc no race conditions when updating rows?
 class Forms_HackathonApplicant(SQLModel, table=True):
     application_id: uuid.UUID = Field(primary_key=True)
     status: StatusEnum = Field()
 
 
-class Update_Forms_HackathonApplicant(SQLModel):
-    uid: uuid.UUID
-    status: StatusEnum
+class Forms_HackathonApplicantUpdate(SQLModel):
+    status: StatusEnum | None = None
 
 
 class Forms_Question(SQLModel, table=True):
-    order: int
+    question_id: uuid.UUID = Field(default_factory=uuid.uuid4, index=True)
+    order: int = Field(index=True)
+    label: str
+    required: bool
+
+
+class Forms_Answer(SQLModel, table=True):
+    application_id: uuid.UUID = Field(primary_key=True)
+    question_id: uuid.UUID = Field(index=True)
+    answer: str
+
+
+class Forms_AnswerUpdate(SQLModel):
+    answer: str | None = None
 
 
 # Python enums
