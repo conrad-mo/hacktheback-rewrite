@@ -44,9 +44,9 @@ class Forms_HackathonApplicantUpdate(SQLModel):
 
 class Forms_Question(SQLModel, table=True):
     question_id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    order: int = Field(index=True)
+    order: int = Field(index=True)  # Wait do we even need this field?
     label: str
-    required: bool
+    # required: bool  # Wait do we even need this field?
 
 
 # API to return everything related and we just pass id to modify form answers or else need to index question table for every update

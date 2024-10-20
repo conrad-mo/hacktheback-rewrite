@@ -4,6 +4,19 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.db import create_db_and_tables
 from app.routers import router
+from app.models.forms import Forms_Question
+
+questions = [
+    "First Name",
+    "Last Name",
+    "Email",
+    "Phone Number",
+    "Country",
+    "School Name",
+    "Current Level of Study",
+    "Major",
+    "Expected Graduation Year",
+]
 
 
 def get_application():
@@ -20,6 +33,14 @@ def get_application():
     app.include_router(router, prefix="/api")
 
     return app
+
+
+def create_questions():
+    for i in range(len(questions)):
+        form_question = Forms_Question(
+            order=i,
+            label=questions[i],
+        )
 
 
 app = get_application()

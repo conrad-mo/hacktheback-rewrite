@@ -5,7 +5,12 @@ from fastapi import APIRouter, Depends
 from sqlmodel import select
 
 from app.core.db import SessionDep
-from app.models.forms import Forms_Application, Forms_HackathonApplicant, StatusEnum
+from app.models.forms import (
+    Forms_Application,
+    Forms_HackathonApplicant,
+    Forms_Question,
+    StatusEnum,
+)
 from app.models.user import Account_User
 from app.routers.account import get_current_user
 
@@ -32,6 +37,11 @@ async def createapplication(current_user: Account_User, session: SessionDep):
     session.refresh(db_application)
     session.refresh(db_hackathon_applicant)
     return db_application
+
+
+async def getquestions(session: SessionDep) -> list[Forms_Question]:
+    statement = select(Forms_Question)
+    return session.exect(statement).first()
 
 
 @router.get("/getapplication", response_model=Forms_Application)
