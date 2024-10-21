@@ -159,7 +159,7 @@ requires-dist = [
     { name = "alembic", specifier = ">=1.13.3" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115.2" },
     { name = "passlib", specifier = ">=1.7.4" },
-    { name = "psycopg2-binary", specifier = ">=2.9.9" },
+    { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "pyjwt", specifier = ">=2.9.0" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
     { name = "sqlmodel", specifier = ">=0.0.22" },

@@ -20,7 +20,7 @@ router = APIRouter()
 async def createapplication(current_user: Account_User, session: SessionDep):
     application = Forms_Application(
         uid=current_user.uid,
-        is_draft=False,
+        is_draft=True,
         created_at=datetime.now(timezone.utc),
         updated_at=datetime.now(timezone.utc),
     )
