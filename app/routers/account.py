@@ -86,7 +86,7 @@ async def login(
         )
     if not selected_user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Account not activated"
+            status_code=status.HTTP_401_NOT_FOUND, detail="Account not activated"
         )
     scopes = []
     if selected_user.role == "admin":
