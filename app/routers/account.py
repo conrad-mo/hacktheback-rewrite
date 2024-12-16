@@ -7,12 +7,13 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
+from passlib.hash import pbkdf2_sha256
 from sqlmodel import select
 
 from app.core.db import SessionDep
 from app.models.token import Token, TokenData
 from app.models.user import Account_User, UserCreate, UserPublic
-from app.utils import create_access_token, hash_password, password_verfiy
+from app.utils import create_access_token
 
 load_dotenv()
 
@@ -80,7 +81,7 @@ async def login(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist"
         )
-    if not password_verfiy(form_data.password, selected_user.password):
+    if not pbkdf2_sha256.verify(form_data.password, selected_user.password):
         raise HTTPException(
             status_code=status.HTTP_401_NOT_FOUND, detail="Password is incorrect"
         )
@@ -115,7 +116,7 @@ async def signup(user: UserCreate, session: SessionDep):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User already exists"
         )
-    hashed_password = hash_password(user.password)
+    hashed_password = pbkdf2_sha256.hash(user.password)
     extra_data = {"password": hashed_password, "role": "hacker", "is_active": False}
     db_user = Account_User.model_validate(user, update=extra_data)
     session.add(db_user)
