@@ -14,21 +14,11 @@ from app.utils import (
     ALGORITHM,
     SECRET_KEY,
     create_access_token,
-    credentials_exception,
     decode_jwt,
+    get_current_user,
 )
 
 router = APIRouter()
-
-
-async def get_current_user(
-    token_data: Annotated[TokenData, Depends(decode_jwt)], session: SessionDep
-):
-    statement = select(Account_User).where(Account_User.email == token_data.email)
-    user = session.exec(statement).first()
-    if user is None:
-        raise credentials_exception
-    return user
 
 
 # Uses type application/x-www-form-urlencoded for response body, not JSON

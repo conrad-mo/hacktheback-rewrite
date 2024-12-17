@@ -12,7 +12,7 @@ from app.models.forms import (
     StatusEnum,
 )
 from app.models.user import Account_User
-from app.routers.account import get_current_user
+from app.utils import get_current_user
 
 router = APIRouter()
 

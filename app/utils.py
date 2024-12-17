@@ -7,8 +7,11 @@ from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
+from sqlmodel import select
 
+from app.core.db import SessionDep
 from app.models.token import TokenData
+from app.models.user import Account_User
 
 load_dotenv()
 
@@ -51,6 +54,16 @@ async def decode_jwt(token: Annotated[str, Depends(oauth2_scheme)]):
     except InvalidTokenError:
         raise credentials_exception
     return token_data
+
+
+async def get_current_user(
+    token_data: Annotated[TokenData, Depends(decode_jwt)], session: SessionDep
+):
+    statement = select(Account_User).where(Account_User.email == token_data.email)
+    user = session.exec(statement).first()
+    if user is None:
+        raise credentials_exception
+    return user
 
 
 def create_access_token(
