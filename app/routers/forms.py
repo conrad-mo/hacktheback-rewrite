@@ -17,7 +17,11 @@ from app.routers.account import get_current_user
 router = APIRouter()
 
 
-async def createapplication(current_user: Account_User, session: SessionDep):
+@router.post("/createapplication")
+async def createapplication(
+    current_user: Annotated[Account_User, Depends(get_current_user)],
+    session: SessionDep,
+):
     application = Forms_Application(
         uid=current_user.uid,
         is_draft=True,
@@ -39,6 +43,7 @@ async def createapplication(current_user: Account_User, session: SessionDep):
     return db_application
 
 
+@router.get("/getquestions")
 async def getquestions(session: SessionDep) -> list[Forms_Question]:
     statement = select(Forms_Question)
     return session.exect(statement).first()
