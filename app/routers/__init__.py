@@ -3,10 +3,10 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Security, status
 
 from app.models.token import TokenData
-from app.routers.account import decode_jwt
 from app.routers.account import router as account
 from app.routers.admin import router as admin
 from app.routers.forms import router as forms
+from app.utils import decode_jwt
 
 router = APIRouter()
 
