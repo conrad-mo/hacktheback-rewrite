@@ -42,11 +42,14 @@ class Forms_HackathonApplicantUpdate(SQLModel):
     status: StatusEnum | None = None
 
 
+# Future reference: Designed it like this to prevent people from directly submitting answers to invalid questions
 class Forms_Question(SQLModel, table=True):
-    question_id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    question_id: uuid.UUID = Field(
+        default_factory=uuid.uuid4, primary_key=True
+    )  # Wait do we even need this field?
     order: int = Field(index=True)  # Wait do we even need this field?
-    label: str
-    # required: bool  # Wait do we even need this field?
+    label: str = Field(index=True)
+    required: bool  # Wait do we even need this field?
 
 
 # API to return everything related and we just pass id to modify form answers or else need to index question table for every update

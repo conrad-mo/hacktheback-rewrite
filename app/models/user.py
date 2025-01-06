@@ -11,7 +11,7 @@ class UserBase(SQLModel):
 
 class Account_User(UserBase, table=True):
     uid: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    password: str = Field()
+    password: str
     role: str
     is_active: bool
 
