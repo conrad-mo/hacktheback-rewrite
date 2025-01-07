@@ -1,6 +1,10 @@
 import uuid
+from typing import TYPE_CHECKING, Optional
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
+
+if TYPE_CHECKING:
+    from app.models.forms import Forms_Application
 
 
 class UserBase(SQLModel):
@@ -10,10 +14,15 @@ class UserBase(SQLModel):
 
 
 class Account_User(UserBase, table=True):
-    uid: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    uid: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        primary_key=True,
+        foreign_key="forms_application.uid",
+    )
     password: str
     role: str
     is_active: bool
+    application: Optional["Forms_Application"] = Relationship(back_populates="user")
 
 
 class UserCreate(UserBase):

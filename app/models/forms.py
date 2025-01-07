@@ -1,8 +1,12 @@
 import uuid
 from datetime import datetime
 from enum import Enum
+from typing import TYPE_CHECKING, Optional
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
+
+if TYPE_CHECKING:
+    from app.models.user import Account_User
 
 
 class StatusEnum(str, Enum):
@@ -24,7 +28,13 @@ class Forms_Application(SQLModel, table=True):
     is_draft: bool
     created_at: datetime
     updated_at: datetime
-    application_id: uuid.UUID = Field(default_factory=uuid.uuid4, index=True)
+    application_id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        index=True,
+        unique=True,
+    )
+    user: Optional["Account_User"] = Relationship(back_populates="application")
+    form_answers: list["Forms_Answer"] = Relationship(back_populates="applicant")
 
 
 class Forms_ApplicationUpdate(SQLModel):
@@ -34,7 +44,9 @@ class Forms_ApplicationUpdate(SQLModel):
 
 # Separate bc no race conditions when updating rows?
 class Forms_HackathonApplicant(SQLModel, table=True):
-    application_id: uuid.UUID = Field(primary_key=True)
+    application_id: uuid.UUID = Field(
+        primary_key=True, foreign_key="forms_application.application_id"
+    )
     status: StatusEnum = Field()
 
 
@@ -55,9 +67,12 @@ class Forms_Question(SQLModel, table=True):
 # API to return everything related and we just pass id to modify form answers or else need to index question table for every update
 class Forms_Answer(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    application_id: uuid.UUID = Field(index=True)
+    application_id: uuid.UUID = Field(
+        index=True, foreign_key="forms_application.application_id"
+    )
     question_id: uuid.UUID = Field(index=True)
     answer: str
+    applicant: Forms_Application = Relationship(back_populates="form_answers")
 
 
 class Forms_AnswerUpdate(SQLModel):

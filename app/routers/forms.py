@@ -46,7 +46,7 @@ async def createapplication(
 @router.get("/getquestions")
 async def getquestions(session: SessionDep) -> list[Forms_Question]:
     statement = select(Forms_Question)
-    return session.exect(statement).first()
+    return session.exec(statement)
 
 
 @router.get("/getapplication", response_model=Forms_Application)
@@ -64,7 +64,10 @@ async def getapplication(
 
 
 @router.post("/save")
-async def save():
+async def save(
+    current_application: Annotated[Forms_Application, Depends(getapplication)],
+    session: SessionDep,
+):
     return {"username": "fakecurrentuser"}
 
 
