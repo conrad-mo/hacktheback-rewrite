@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile
 from sqlmodel import select
 
 from app.core.db import SessionDep
@@ -33,6 +33,14 @@ async def getapplication(
 
 @router.post("/save")
 async def save(
+    session: SessionDep,
+):
+    return {"username": "fakecurrentuser"}
+
+
+@router.post("/uploadresume")
+async def uploadresume(
+    file: UploadFile,
     session: SessionDep,
 ):
     return {"username": "fakecurrentuser"}

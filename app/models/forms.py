@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING, Optional
 
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Column, Field, LargeBinary, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from app.models.user import Account_User
@@ -44,6 +44,9 @@ class Forms_Application(SQLModel, table=True):
     hackathonapplicant: Optional["Forms_HackathonApplicant"] = Relationship(
         back_populates="applicant"
     )
+    form_answersfile: Optional["Forms_AnswerFile"] = Relationship(
+        back_populates="applicant"
+    )
 
 
 class Forms_ApplicationUpdate(SQLModel):
@@ -68,12 +71,10 @@ class Forms_HackathonApplicantUpdate(SQLModel):
 
 # Future reference: Designed it like this to prevent people from directly submitting answers to invalid questions
 class Forms_Question(SQLModel, table=True):
-    question_id: uuid.UUID = Field(
-        default_factory=uuid.uuid4, primary_key=True
-    )  # Wait do we even need this field?
-    order: int = Field(index=True)  # Wait do we even need this field?
+    question_id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    order: int = Field(index=True)
     label: str = Field(index=True)
-    required: bool  # Wait do we even need this field?
+    required: bool
 
 
 # API to return everything related and we just pass id to modify form answers or else need to index question table for every update
@@ -83,7 +84,7 @@ class Forms_Answer(SQLModel, table=True):
         default=None, index=True, foreign_key="forms_application.application_id"
     )
     question_id: uuid.UUID = Field(index=True)
-    answer: str
+    answer: str | None = None
     applicant: Optional["Forms_Application"] = Relationship(
         back_populates="form_answers"
     )
@@ -91,3 +92,16 @@ class Forms_Answer(SQLModel, table=True):
 
 class Forms_AnswerUpdate(SQLModel):
     answer: str | None = None
+
+
+class Forms_AnswerFile(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    application_id: uuid.UUID | None = Field(
+        default=None, index=True, foreign_key="forms_application.application_id"
+    )
+    original_filename: str
+    file: bytes = Field(sa_column=Column(LargeBinary))
+    question_id: uuid.UUID = Field(index=True)
+    applicant: Optional["Forms_Application"] = Relationship(
+        back_populates="form_answersfile"
+    )
