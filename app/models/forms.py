@@ -24,7 +24,11 @@ class StatusEnum(str, Enum):
 
 
 class Forms_Application(SQLModel, table=True):
-    uid: uuid.UUID = Field(primary_key=True)
+    uid: uuid.UUID | None = Field(
+        default=None,
+        primary_key=True,
+        foreign_key="account_user.uid",
+    )
     is_draft: bool
     created_at: datetime
     updated_at: datetime
@@ -34,7 +38,12 @@ class Forms_Application(SQLModel, table=True):
         unique=True,
     )
     user: Optional["Account_User"] = Relationship(back_populates="application")
-    form_answers: list["Forms_Answer"] = Relationship(back_populates="applicant")
+    form_answers: Optional[list["Forms_Answer"]] = Relationship(
+        back_populates="applicant"
+    )
+    hackathonapplicant: Optional["Forms_HackathonApplicant"] = Relationship(
+        back_populates="applicant"
+    )
 
 
 class Forms_ApplicationUpdate(SQLModel):
@@ -44,10 +53,13 @@ class Forms_ApplicationUpdate(SQLModel):
 
 # Separate bc no race conditions when updating rows?
 class Forms_HackathonApplicant(SQLModel, table=True):
-    application_id: uuid.UUID = Field(
-        primary_key=True, foreign_key="forms_application.application_id"
+    application_id: uuid.UUID | None = Field(
+        default=None, primary_key=True, foreign_key="forms_application.application_id"
     )
     status: StatusEnum = Field()
+    applicant: Optional["Forms_Application"] = Relationship(
+        back_populates="hackathonapplicant"
+    )
 
 
 class Forms_HackathonApplicantUpdate(SQLModel):
@@ -67,12 +79,14 @@ class Forms_Question(SQLModel, table=True):
 # API to return everything related and we just pass id to modify form answers or else need to index question table for every update
 class Forms_Answer(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    application_id: uuid.UUID = Field(
-        index=True, foreign_key="forms_application.application_id"
+    application_id: uuid.UUID | None = Field(
+        default=None, index=True, foreign_key="forms_application.application_id"
     )
     question_id: uuid.UUID = Field(index=True)
     answer: str
-    applicant: Forms_Application = Relationship(back_populates="form_answers")
+    applicant: Optional["Forms_Application"] = Relationship(
+        back_populates="form_answers"
+    )
 
 
 class Forms_AnswerUpdate(SQLModel):

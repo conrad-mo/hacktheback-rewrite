@@ -10,6 +10,11 @@ from jwt.exceptions import InvalidTokenError
 from sqlmodel import select
 
 from app.core.db import SessionDep
+from app.models.forms import (
+    Forms_Application,
+    Forms_HackathonApplicant,
+    StatusEnum,
+)
 from app.models.token import TokenData
 from app.models.user import Account_User
 
@@ -58,7 +63,7 @@ async def decode_jwt(token: Annotated[str, Depends(oauth2_scheme)]):
 
 async def get_current_user(
     token_data: Annotated[TokenData, Depends(decode_jwt)], session: SessionDep
-):
+) -> Account_User:
     statement = select(Account_User).where(Account_User.email == token_data.email)
     user = session.exec(statement).first()
     if user is None:
@@ -77,3 +82,24 @@ def create_access_token(
     to_encode.update({"iat": datetime.now(timezone.utc), "exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+async def createapplication(
+    current_user: Annotated[Account_User, Depends(get_current_user)],
+    session: SessionDep,
+):
+    application = Forms_Application(
+        user=current_user,
+        is_draft=True,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
+    )
+    hackathon_applicant = Forms_HackathonApplicant(
+        applicant=application, status=StatusEnum.APPLYING
+    )
+    db_hackathon_applicant = Forms_HackathonApplicant.model_validate(
+        hackathon_applicant
+    )
+    session.add(db_hackathon_applicant)
+    session.commit()
+    session.refresh(db_hackathon_applicant)
+    return current_user.application

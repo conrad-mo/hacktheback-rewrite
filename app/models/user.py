@@ -17,7 +17,6 @@ class Account_User(UserBase, table=True):
     uid: uuid.UUID = Field(
         default_factory=uuid.uuid4,
         primary_key=True,
-        foreign_key="forms_application.uid",
     )
     password: str
     role: str
