@@ -109,14 +109,11 @@ async def createapplication(
     statement = select(Forms_Question)
     questions = session.exec(statement)
     for question in questions:
-        print(question.label)
         if "resume" not in question.label.lower():
-            print("create non-resume standard answer")
             answer = Forms_Answer(answer=None, question_id=question.question_id)
             db_answer = Forms_Answer.model_validate(answer)
             application.form_answers.append(db_answer)
         else:
-            print("create resume")
             answerfile = Forms_AnswerFile(
                 original_filename=None,
                 file=None,
