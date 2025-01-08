@@ -2,7 +2,7 @@ from io import BytesIO
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from sqlmodel import select
 
@@ -51,10 +51,10 @@ async def getapplication(uid: UIDRequest, session: SessionDep):
     statement = select(Account_User).where(Account_User.uid == uid.uid)
     selected_user = session.exec(statement).first()
     if selected_user is None:
-        raise "User not found"
+        raise HTTPException(status_code=404, detail="User not found")
     application = selected_user.application
     if application is None:
-        raise "Application not found"
+        raise HTTPException(status_code=404, detail="Application not found")
     return {
         "application": application,
         "form_answers": application.form_answers,

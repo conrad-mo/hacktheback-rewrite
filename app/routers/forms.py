@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from sqlmodel import select
 
 from app.core.db import SessionDep
@@ -61,7 +61,7 @@ async def uploadresume(
         session.refresh(current_user.application)
         return current_user.application.form_answersfile.original_filename
     else:
-        return "Error: Not pdf"
+        raise HTTPException(status_code=404, detail="File not pdf")
 
 
 @router.post("/submit")
