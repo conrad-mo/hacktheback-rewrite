@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, UploadFile
@@ -28,7 +29,7 @@ async def getapplication(
     return {
         "application": application,
         "form_answers": application.form_answers,
-        "form_answersfile": application.form_answersfile,
+        "form_answersfile": application.form_answersfile.original_filename,
     }
 
 
@@ -48,8 +49,19 @@ async def uploadresume(
     current_user: Annotated[Account_User, Depends(get_current_user)],
     session: SessionDep,
 ):
-    file_data = await file.read()
-    return {"username": "fakecurrentuser"}
+    if file.filename.endswith(".pdf"):
+        file_data = await file.read()
+        current_user.application.form_answersfile.original_filename = file.filename
+        current_user.application.form_answersfile.file = file_data
+        current_user.application.updated_at = datetime.now(timezone.utc)
+        session.add(current_user.application.form_answersfile)
+        session.add(current_user.application)
+        session.commit()
+        session.refresh(current_user.application.form_answersfile)
+        session.refresh(current_user.application)
+        return current_user.application.form_answersfile.original_filename
+    else:
+        return "Error: Not pdf"
 
 
 @router.post("/submit")

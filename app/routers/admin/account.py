@@ -1,9 +1,14 @@
+from io import BytesIO
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import APIRouter, Query
+from fastapi.responses import StreamingResponse
 from sqlmodel import select
 
 from app.core.db import SessionDep
+from app.models.forms import Forms_AnswerFile
+from app.models.requests import UIDRequest
 from app.models.user import Account_User, UserPublic
 
 router = APIRouter()
@@ -17,3 +22,41 @@ def get_users(
 ) -> list[UserPublic]:
     users = session.exec(select(Account_User).offset(offset).limit(limit)).all()
     return users
+
+
+@router.get("/file/{application_id}")
+async def get_resume(
+    application_id: UUID,
+    session: SessionDep,
+):
+    statement = select(Forms_AnswerFile).where(
+        Forms_AnswerFile.application_id == application_id
+    )
+    resume = session.exec(statement).first()
+    if resume is None:
+        raise "Resume not found"
+    file_stream = BytesIO(resume.file)
+
+    return StreamingResponse(
+        file_stream,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"attachment; filename={resume.original_filename}"
+        },
+    )
+
+
+@router.get("/getapplication")
+async def getapplication(uid: UIDRequest, session: SessionDep):
+    statement = select(Account_User).where(Account_User.uid == uid.uid)
+    selected_user = session.exec(statement).first()
+    if selected_user is None:
+        raise "User not found"
+    application = selected_user.application
+    if application is None:
+        raise "Application not found"
+    return {
+        "application": application,
+        "form_answers": application.form_answers,
+        "form_answersfile": application.form_answersfile.original_filename,
+    }

@@ -108,7 +108,12 @@ class Forms_AnswerFile(SQLModel, table=True):
     )
 
 
+class Forms_AnswerFileUpdate(SQLModel):
+    original_filename: str | None = None
+    file: bytes | None = Field(sa_column=Column(LargeBinary))
+
+
 class ApplicationResponse(BaseModel):
     application: Forms_Application
     form_answers: list[Forms_Answer]
-    form_answersfile: Forms_AnswerFile
+    form_answersfile: str
