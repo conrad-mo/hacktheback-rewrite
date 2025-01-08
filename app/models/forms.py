@@ -3,6 +3,7 @@ from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING, Optional
 
+from pydantic import BaseModel
 from sqlmodel import Column, Field, LargeBinary, Relationship, SQLModel
 
 if TYPE_CHECKING:
@@ -105,3 +106,9 @@ class Forms_AnswerFile(SQLModel, table=True):
     applicant: Optional["Forms_Application"] = Relationship(
         back_populates="form_answersfile"
     )
+
+
+class ApplicationResponse(BaseModel):
+    application: Forms_Application
+    form_answers: list[Forms_Answer]
+    form_answersfile: Forms_AnswerFile
