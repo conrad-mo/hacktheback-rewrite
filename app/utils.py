@@ -11,8 +11,11 @@ from sqlmodel import select
 
 from app.core.db import SessionDep
 from app.models.forms import (
+    Forms_Answer,
+    Forms_AnswerFile,
     Forms_Application,
     Forms_HackathonApplicant,
+    Forms_Question,
     StatusEnum,
 )
 from app.models.token import TokenData
@@ -83,6 +86,7 @@ def create_access_token(
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+
 async def createapplication(
     current_user: Annotated[Account_User, Depends(get_current_user)],
     session: SessionDep,
@@ -102,4 +106,24 @@ async def createapplication(
     session.add(db_hackathon_applicant)
     session.commit()
     session.refresh(db_hackathon_applicant)
+    statement = select(Forms_Question)
+    questions = session.exec(statement)
+    for question in questions:
+        print(question.label)
+        if "resume" not in question.label.lower():
+            print("create non-resume standard answer")
+            answer = Forms_Answer(answer=None, question_id=question.question_id)
+            db_answer = Forms_Answer.model_validate(answer)
+            application.form_answers.append(db_answer)
+        else:
+            print("create resume")
+            answerfile = Forms_AnswerFile(
+                original_filename=None,
+                file=None,
+                question_id=question.question_id,
+            )
+            db_answerfile = Forms_AnswerFile.model_validate(answerfile)
+            application.form_answersfile = db_answerfile
+    session.add(application)
+    session.commit()
     return current_user.application

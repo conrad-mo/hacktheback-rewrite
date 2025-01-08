@@ -41,8 +41,10 @@ async def save(
 @router.post("/uploadresume")
 async def uploadresume(
     file: UploadFile,
+    current_user: Annotated[Account_User, Depends(get_current_user)],
     session: SessionDep,
 ):
+    file_data = await file.read()
     return {"username": "fakecurrentuser"}
 
 

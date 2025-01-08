@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from sqlmodel import Session
-from app.core.db import create_db_and_tables, seed_questions, engine
+
+from app.core.db import create_db_and_tables, engine, seed_questions
 from app.routers import router
 
 questions = [
@@ -15,6 +15,16 @@ questions = [
     {"label": "Current Level of Study", "required": True},
     {"label": "Major", "required": True},
     {"label": "Expected Graduation Year", "required": True},
+    {"label": "Age", "required": True},
+    {"label": "Gender", "required": True},
+    {"label": "Race/Ethnicity", "required": True},
+    {"label": "Number of Hackathons Attended", "required": True},
+    {"label": "Github", "required": False},
+    {"label": "Linkedin", "required": False},
+    {"label": "Portfolio", "required": False},
+    {"label": "Attach Your Resume", "required": True},
+    {"label": "Dietary Restrictions", "required": True},
+    {"label": "T-Shirt Size", "required": True},
 ]
 
 

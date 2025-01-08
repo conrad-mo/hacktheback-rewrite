@@ -99,8 +99,8 @@ class Forms_AnswerFile(SQLModel, table=True):
     application_id: uuid.UUID | None = Field(
         default=None, index=True, foreign_key="forms_application.application_id"
     )
-    original_filename: str
-    file: bytes = Field(sa_column=Column(LargeBinary))
+    original_filename: str | None = None
+    file: bytes | None = Field(sa_column=Column(LargeBinary))
     question_id: uuid.UUID = Field(index=True)
     applicant: Optional["Forms_Application"] = Relationship(
         back_populates="form_answersfile"
