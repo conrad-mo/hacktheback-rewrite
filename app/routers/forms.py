@@ -28,6 +28,10 @@ async def getapplication(
     current_user: Annotated[Account_User, Depends(get_current_user)],
     session: SessionDep,
 ):
+    if not await isValidSubmissionTime(session):
+        raise HTTPException(
+            status_code=404, detail="Submitting outside submission time"
+        )
     application = current_user.application
     if application is None:
         application = await createapplication(current_user, session)
@@ -44,6 +48,10 @@ async def save(
     current_user: Annotated[Account_User, Depends(get_current_user)],
     session: SessionDep,
 ):
+    if not await isValidSubmissionTime(session):
+        raise HTTPException(
+            status_code=404, detail="Submitting outside submission time"
+        )
     index, form_answer = next(
         (i, answer)
         for i, answer in enumerate(current_user.application.form_answers)
@@ -68,6 +76,10 @@ async def uploadresume(
     current_user: Annotated[Account_User, Depends(get_current_user)],
     session: SessionDep,
 ):
+    if not await isValidSubmissionTime(session):
+        raise HTTPException(
+            status_code=404, detail="Submitting outside submission time"
+        )
     if file.filename.endswith(".pdf"):
         file_data = await file.read()
         current_user.application.form_answersfile.original_filename = file.filename
@@ -89,6 +101,10 @@ async def submit(
     session: SessionDep,
 ):
     # Check if all mandatory ones are ok + is applying + isdraft + is within the application time
+    if not await isValidSubmissionTime(session):
+        raise HTTPException(
+            status_code=404, detail="Submitting outside submission time"
+        )
     for answer in current_user.application.form_answers:
         if answer.answer is None:
             statement = select(Forms_Question).where(
@@ -101,10 +117,6 @@ async def submit(
                 )
     if current_user.application.form_answersfile.original_filename is None:
         raise HTTPException(status_code=404, detail="Resume not uploaded")
-    if not await isValidSubmissionTime(session):
-        raise HTTPException(
-            status_code=404, detail="Submitting outside submission time"
-        )
     if not current_user.application.hackathonapplicant.status == StatusEnum.APPLYING:
         raise HTTPException(status_code=404, detail="User not applying")
     else:
