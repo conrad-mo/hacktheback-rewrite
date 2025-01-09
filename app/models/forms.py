@@ -126,4 +126,4 @@ class Forms_AnswerFileUpdate(SQLModel):
 class ApplicationResponse(BaseModel):
     application: Forms_Application
     form_answers: list[Forms_Answer]
-    form_answersfile: str
+    form_answersfile: str | None
