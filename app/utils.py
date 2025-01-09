@@ -116,6 +116,8 @@ async def createapplication(
                 answer.answer = current_user.first_name
             elif "last name" in question.label.lower():
                 answer.answer = current_user.last_name
+            elif "email" in question.label.lower():
+                answer.answer = current_user.email
             db_answer = Forms_Answer.model_validate(answer)
             application.form_answers.append(db_answer)
         else:
