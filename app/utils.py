@@ -137,7 +137,4 @@ async def isValidSubmissionTime(session: SessionDep):
     time = session.exec(select(Forms_Form).limit(1)).first()
     if time is None:
         return False
-    return (
-        datetime.now(timezone(timedelta(hours=-4))) > time.start_at
-        and datetime.now(timezone(timedelta(hours=-4))) < time.end_at
-    )
+    return time.start_at < datetime.now(timezone.utc) < time.end_at

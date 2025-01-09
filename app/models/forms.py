@@ -4,7 +4,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Optional
 
 from pydantic import BaseModel
-from sqlmodel import Column, Field, LargeBinary, Relationship, SQLModel
+from sqlmodel import Column, DateTime, Field, LargeBinary, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from app.models.user import Account_User
@@ -29,8 +29,10 @@ class Forms_Form(SQLModel, table=True):
         default_factory=uuid.uuid4,
         primary_key=True,
     )
-    start_at: datetime
-    end_at: datetime
+    start_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False)
+    )
+    end_at: datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=False))
 
 
 class Forms_Application(SQLModel, table=True):

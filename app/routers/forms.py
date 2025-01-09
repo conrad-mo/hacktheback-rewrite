@@ -101,7 +101,7 @@ async def submit(
                 )
     if current_user.application.form_answersfile.original_filename is None:
         raise HTTPException(status_code=404, detail="Resume not uploaded")
-    if isValidSubmissionTime(session):
+    if not await isValidSubmissionTime(session):
         raise HTTPException(
             status_code=404, detail="Submitting outside submission time"
         )
@@ -120,3 +120,8 @@ async def submit(
     session.refresh(current_user.application.hackathonapplicant)
     session.refresh(current_user.application)
     return "Success"
+
+
+@router.get("/submissiontime")
+async def submissiontime(session: SessionDep):
+    return await isValidSubmissionTime(session)
