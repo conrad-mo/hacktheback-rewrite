@@ -113,6 +113,7 @@ async def submit(
         raise HTTPException(status_code=404, detail="Application not draft")
     else:
         current_user.application.is_draft = False
+        current_user.application.updated_at = datetime.now(timezone.utc)
     session.add(current_user.application.hackathonapplicant)
     session.add(current_user.application)
     session.commit()
