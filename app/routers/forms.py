@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from sqlmodel import select
 
 from app.core.db import SessionDep
-from app.models.forms import ApplicationResponse, Forms_Question
+from app.models.forms import ApplicationResponse, Forms_AnswerUpdate, Forms_Question
 from app.models.user import Account_User
 from app.utils import createapplication, get_current_user
 
@@ -35,12 +35,26 @@ async def getapplication(
 
 @router.post("/save")
 async def save(
-    question_id: str,
-    answer: str,
+    forms_answerupdate: Forms_AnswerUpdate,
     current_user: Annotated[Account_User, Depends(get_current_user)],
     session: SessionDep,
 ):
-    return {"username": "fakecurrentuser"}
+    index, form_answer = next(
+        (i, answer)
+        for i, answer in enumerate(current_user.application.form_answers)
+        if str(answer.question_id) == forms_answerupdate.question_id
+    )
+    if form_answer:
+        form_answer.answer = forms_answerupdate.answer
+        current_user.application.updated_at = datetime.now(timezone.utc)
+        session.add(form_answer)
+        session.add(current_user.application)
+        session.commit()
+        session.refresh(current_user.application.form_answers[index])
+        session.refresh(current_user.application)
+        return forms_answerupdate
+    else:
+        raise HTTPException(status_code=404, detail="Form Application not found")
 
 
 @router.post("/uploadresume")

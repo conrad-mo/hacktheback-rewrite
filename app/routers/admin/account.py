@@ -34,7 +34,7 @@ async def get_resume(
     )
     resume = session.exec(statement).first()
     if resume is None:
-        raise "Resume not found"
+        raise HTTPException(status_code=404, detail="Resume not found")
     file_stream = BytesIO(resume.file)
 
     return StreamingResponse(

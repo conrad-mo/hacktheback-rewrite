@@ -92,6 +92,7 @@ class Forms_Answer(SQLModel, table=True):
 
 
 class Forms_AnswerUpdate(SQLModel):
+    question_id: str
     answer: str | None = None
 
 
