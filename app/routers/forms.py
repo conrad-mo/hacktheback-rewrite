@@ -101,7 +101,7 @@ async def submit(
                 )
     if current_user.application.form_answersfile.original_filename is None:
         raise HTTPException(status_code=404, detail="Resume not uploaded")
-    if not isValidSubmissionTime(session):
+    if isValidSubmissionTime(session):
         raise HTTPException(
             status_code=404, detail="Submitting outside submission time"
         )
