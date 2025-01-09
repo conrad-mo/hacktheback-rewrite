@@ -113,3 +113,9 @@ async def submit(
         raise HTTPException(status_code=404, detail="Application not draft")
     else:
         current_user.application.is_draft = False
+    session.add(current_user.application.hackathonapplicant)
+    session.add(current_user.application)
+    session.commit()
+    session.refresh(current_user.application.hackathonapplicant)
+    session.refresh(current_user.application)
+    return "Success"
