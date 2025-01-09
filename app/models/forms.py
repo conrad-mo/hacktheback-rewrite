@@ -24,6 +24,15 @@ class StatusEnum(str, Enum):
     WALK_IN_SUBMITTED = "WALK_IN SUBMITTED"
 
 
+class Forms_Form(SQLModel, table=True):
+    id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        primary_key=True,
+    )
+    start_at: datetime
+    end_at: datetime
+
+
 class Forms_Application(SQLModel, table=True):
     uid: uuid.UUID | None = Field(
         default=None,

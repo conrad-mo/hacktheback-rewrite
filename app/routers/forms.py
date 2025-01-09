@@ -79,5 +79,8 @@ async def uploadresume(
 
 
 @router.post("/submit")
-async def submit():
+async def submit(
+    current_user: Annotated[Account_User, Depends(get_current_user)],
+    session: SessionDep,
+):
     return {"username": "fakecurrentuser"}

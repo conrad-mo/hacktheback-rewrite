@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session
 
-from app.core.db import create_db_and_tables, engine, seed_questions
+from app.core.db import create_db_and_tables, engine, seed_form_time, seed_questions
 from app.routers import router
 
 questions = [
@@ -52,6 +52,7 @@ def on_startup():
     create_db_and_tables()
     with Session(engine) as session:
         seed_questions(questions, session)
+        seed_form_time(session)
 
 
 @app.get("/")
