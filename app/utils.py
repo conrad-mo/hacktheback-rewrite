@@ -14,6 +14,7 @@ from app.models.forms import (
     Forms_Answer,
     Forms_AnswerFile,
     Forms_Application,
+    Forms_Form,
     Forms_HackathonApplicant,
     Forms_Question,
     StatusEnum,
@@ -124,3 +125,13 @@ async def createapplication(
     session.add(application)
     session.commit()
     return current_user.application
+
+
+async def isValidSubmissionTime(session: SessionDep):
+    time = session.exec(select(Forms_Form).limit(1)).first()
+    if time is None:
+        return False
+    return (
+        datetime.now(timezone(timedelta(hours=-4))) > time.start_at
+        and datetime.now(timezone(timedelta(hours=-4))) < time.end_at
+    )

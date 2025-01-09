@@ -5,9 +5,14 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from sqlmodel import select
 
 from app.core.db import SessionDep
-from app.models.forms import ApplicationResponse, Forms_AnswerUpdate, Forms_Question
+from app.models.forms import (
+    ApplicationResponse,
+    Forms_AnswerUpdate,
+    Forms_Question,
+    StatusEnum,
+)
 from app.models.user import Account_User
-from app.utils import createapplication, get_current_user
+from app.utils import createapplication, get_current_user, isValidSubmissionTime
 
 router = APIRouter()
 
@@ -83,4 +88,28 @@ async def submit(
     current_user: Annotated[Account_User, Depends(get_current_user)],
     session: SessionDep,
 ):
-    return {"username": "fakecurrentuser"}
+    # Check if all mandatory ones are ok + is applying + isdraft + is within the application time
+    for answer in current_user.application.form_answers:
+        if answer.answer is None:
+            statement = select(Forms_Question).where(
+                Forms_Question.question_id == answer.question_id
+            )
+            selected_question = session.exec(statement).first()
+            if selected_question.required:
+                raise HTTPException(
+                    status_code=404, detail=f"{selected_question.label} not answered"
+                )
+    if current_user.application.form_answersfile.original_filename is None:
+        raise HTTPException(status_code=404, detail="Resume not uploaded")
+    if not isValidSubmissionTime(session):
+        raise HTTPException(
+            status_code=404, detail="Submitting outside submission time"
+        )
+    if not current_user.application.hackathonapplicant.status == StatusEnum.APPLYING:
+        raise HTTPException(status_code=404, detail="User not applying")
+    else:
+        current_user.application.hackathonapplicant.status = StatusEnum.APPLIED
+    if not current_user.application.is_draft:
+        raise HTTPException(status_code=404, detail="Application not draft")
+    else:
+        current_user.application.is_draft = False
