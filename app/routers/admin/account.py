@@ -24,6 +24,22 @@ def get_users(
     return users
 
 
+# Need to improve with search query instead of with just offsets
+@router.get("/getapplicants")
+async def getapplicants(
+    session: SessionDep,
+    offset: int = 0,
+    limit: Annotated[int, Query(le=100)] = 100,
+):
+    applicants = session.exec(
+        select(Account_User)
+        .offset(offset)
+        .limit(limit)
+        .where(Account_User.application.application_id is not None)
+    ).all()
+    return applicants
+
+
 @router.get("/file/{application_id}")
 async def get_resume(
     application_id: UUID,
