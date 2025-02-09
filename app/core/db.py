@@ -3,13 +3,16 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated, List
 
 from fastapi import Depends
-from sqlmodel import Session, SQLModel, create_engine, select
+from sqlmodel import Session, SQLModel, select
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
 
 from app.models.forms import Forms_Form, Forms_Question
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, echo=True)
+Base = declarative_base()
 
 
 # Dependency for using the database session
@@ -23,7 +26,7 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 # Initialize the database
 def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
+    Base.metadata.create_all(engine)
 
 
 def seed_questions(questions: List, session: Session):
